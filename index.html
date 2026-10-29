@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sinau Aksara Jawa - SDN Musirkidul</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Noto+Sans+Javanese&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(135deg, #0284c7 0%, #0369a1 50%, #075985 100%);
+            touch-action: manipulation;
+            user-select: none;
+        }
+
+        .font-jawa {
+            font-family: 'Noto Sans Javanese', 'Segoe UI Historic', serif;
+        }
+
+        /* Glassmorphism Effect */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(12px);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-interactive {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 6px 0 #0284c7;
+        }
+
+        .btn-interactive:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #0284c7;
+        }
+
+        .btn-orange {
+            box-shadow: 0 6px 0 #c2410c;
+        }
+        .btn-orange:active {
+            box-shadow: 0 2px 0 #c2410c;
+        }
+
+        .btn-green {
+            box-shadow: 0 6px 0 #15803d;
+        }
+        .btn-green:active {
+            box-shadow: 0 2px 0 #15803d;
+        }
+
+        /* Canvas Grid Line */
+        canvas {
+            touch-action: none;
+            background-color: #ffffff;
+            cursor: crosshair;
+        }
+
+        /* Drag & Drop Styling */
+        .draggable {
+            cursor: grab;
+            touch-action: none;
+        }
+        .draggable:active {
+            cursor: grabbing;
+        }
+        .dropzone.highlight {
+            background-color: #fef08a;
+            border-color: #eab308;
+            transform: scale(1.02);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #f59e0b;
+            border-radius: 10px;
+        }
+
+        /* Pulse Animations */
+        @keyframes bounce-subtle {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
+        .animate-bounce-subtle {
+            animation: bounce-subtle 2s infinite;
+        }
+    </style>
+</head>
+<body class="min-h-screen text-slate-800 flex flex-col justify-between p-2 sm:p-4 md:p-6 overflow-x-hidden">
+
+    <!-- HEADER / BANNER UTAMA -->
+    <header class="glass-card rounded-2xl p-4 mb-4 flex flex-col md:flex-row items-center justify-between gap-4 border-b-4 border-amber-400">
+        <div class="flex items-center gap-4 text-center md:text-left">
+            <!-- Logo Resmi SD Negeri Musirkidul -->
+            <div class="relative w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0 bg-white/80 rounded-full p-1 shadow-lg border-2 border-red-500 flex items-center justify-center overflow-hidden">
+                <img 
+                    src="https://cdn.phototourl.com/member/2026-09-28-7f2ee91a-3d8e-4e14-b457-722fc85c8155.png" 
+                    alt="Logo SD Negeri Musirkidul" 
+                    class="w-full h-full object-contain"
+                    onerror="this.onerror=null; this.src='https://placehold.co/200x200/0284c7/ffffff?text=SDN+MUSIRKIDUL';"
+                />
+            </div>
+            <div>
+                <h1 class="text-2xl sm:text-3xl font-extrabold text-sky-900 tracking-tight">SD NEGERI MUSIRKIDUL</h1>
+                <p class="text-amber-600 font-bold text-sm sm:text-base flex items-center justify-center md:justify-start gap-1">
+                    <i class="fa-solid fa-star text-xs"></i> "Sinarengan Nggayuh Kamulyan" <i class="fa-solid fa-star text-xs"></i>
+                </p>
+                <p class="text-xs sm:text-sm text-slate-600 font-semibold mt-1">Media Pembelajaran Interaktif Aksara Jawa - Papan Digital</p>
+            </div>
+        </div>
+
+        <!-- NAVIGATION MODES -->
+        <nav class="flex flex-wrap justify-center gap-2 w-full md:w-auto">
+            <button onclick="switchTab('mengenal')" id="btn-tab-mengenal" class="nav-btn btn-interactive bg-sky-500 hover:bg-sky-600 text-white px-4 py-3 rounded-xl font-bold text-sm sm:text-base flex items-center gap-2">
+                <i class="fa-solid fa-book-open text-lg"></i>
+                <span>1. Mengenal Aksara</span>
+            </button>
+            <button onclick="switchTab('nulis')" id="btn-tab-nulis" class="nav-btn btn-interactive bg-amber-500 hover:bg-amber-600 text-white px-4 py-3 rounded-xl font-bold text-sm sm:text-base flex items-center gap-2">
+                <i class="fa-solid fa-pen-nib text-lg"></i>
+                <span>2. Latihan Nulis</span>
+            </button>
+            <button onclick="switchTab('jodohkan')" id="btn-tab-jodohkan" class="nav-btn btn-interactive bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-3 rounded-xl font-bold text-sm sm:text-base flex items-center gap-2">
+                <i class="fa-solid fa-gamepad text-lg"></i>
+                <span>3. Game Menjodohkan</span>
+            </button>
+        </nav>
+    </header>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="flex-1 my-2">
+
+        <!-- TAB 1: MENGENAL & IDENTIFIKASI AKSARA -->
+        <section id="sec-mengenal" class="tab-content glass-card rounded-2xl p-4 sm:p-6">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4 border-b pb-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-sky-900 flex items-center gap-2">
+                        <i class="fa-solid fa-shapes text-amber-500"></i> Mengenal 20 Aksara Nglegena
+                    </h2>
+                    <p class="text-sm text-slate-600">Tekan/Sentuh kartu aksara untuk mendengarkan lafal dan melihat rincian.</p>
+                </div>
+                <!-- Filter / Mode Belajar -->
+                <div class="flex gap-2">
+                    <button onclick="playAudioText('Aksara Jawa cacahipun wonten kawandasa, yaiku rong puluh aksara nglegena')" class="bg-sky-100 hover:bg-sky-200 text-sky-800 font-bold px-4 py-2 rounded-xl text-sm flex items-center gap-2 border border-sky-300">
+                        <i class="fa-solid fa-volume-high text-sky-600"></i> Bantuan Suara
+                    </button>
+                </div>
+            </div>
+
+            <!-- Grid 20 Aksara Jawa Nglegena -->
+            <div id="grid-aksara" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-3 sm:gap-4 mb-6">
+                <!-- Javascript will populate 20 Aksara cards dynamically -->
+            </div>
+
+            <!-- Modal / Detail Informasi Card -->
+            <div id="detail-box" class="bg-amber-50 rounded-2xl p-4 border-2 border-amber-300 flex flex-col md:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-4">
+                    <div id="detail-char-jawa" class="w-20 h-20 bg-amber-500 text-white rounded-2xl flex items-center justify-center text-5xl font-jawa shadow-md">
+                        ꦲ
+                    </div>
+                    <div>
+                        <span class="text-xs font-bold uppercase tracking-wider text-amber-700 bg-amber-200 px-2 py-0.5 rounded-full">Detail Aksara</span>
+                        <h3 id="detail-char-latin" class="text-3xl font-extrabold text-slate-800">Ha</h3>
+                        <p id="detail-char-desc" class="text-sm text-slate-600 mt-1">Aksara pisanan sajroning urutan Hanacaraka.</p>
+                    </div>
+                </div>
+                <div class="flex gap-3 w-full md:w-auto">
+                    <button onclick="suarakanAksaraAktif()" class="flex-1 md:flex-none btn-interactive bg-sky-500 text-white font-bold px-6 py-3 rounded-xl flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-volume-high text-xl"></i> Swara (Lafal)
+                    </button>
+                    <button onclick="pindahKeNulisDariMengenal()" class="flex-1 md:flex-none btn-interactive btn-orange bg-amber-500 text-white font-bold px-6 py-3 rounded-xl flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-pen-line text-xl"></i> Gladhen Nulis
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 2: LATIHAN NULIS (CANVAS INTERAKTIF) -->
+        <section id="sec-nulis" class="tab-content glass-card rounded-2xl p-4 sm:p-6 hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Left Panel: Selector & Guide -->
+                <div class="lg:col-span-1 bg-sky-50/80 rounded-2xl p-4 border border-sky-200 flex flex-col justify-between">
+                    <div>
+                        <h2 class="text-xl font-bold text-sky-900 mb-2 flex items-center gap-2">
+                            <i class="fa-solid fa-hand-pointer text-amber-500"></i> Pilih Aksara
+                        </h2>
+                        <p class="text-xs text-slate-600 mb-4">Pilih aksara ing ngisor iki kanggo dilatih nulis ing papan digital.</p>
+                        
+                        <!-- Dropdown / Grid selector for Canvas -->
+                        <div id="selector-nulis" class="grid grid-cols-5 gap-2 max-h-48 overflow-y-auto p-1 bg-white rounded-xl border border-sky-200 mb-4">
+                            <!-- Populated by JS -->
+                        </div>
+
+                        <!-- Info Aksara Terpilih -->
+                        <div class="bg-white p-4 rounded-xl border border-sky-200 text-center mb-4">
+                            <span class="text-xs font-bold text-sky-600 uppercase">Target Nulis</span>
+                            <div id="canvas-target-latin" class="text-2xl font-black text-slate-800">HA</div>
+                            <div id="canvas-target-jawa" class="text-6xl font-jawa text-sky-600 my-2">ꦲ</div>
+                            <p class="text-xs text-slate-500">Tirokna bentuk aksara ing papan kanvas sisih tengen.</p>
+                        </div>
+                    </div>
+
+                    <!-- Canvas Control Buttons -->
+                    <div class="space-y-2">
+                        <div class="flex gap-2">
+                            <button onclick="clearCanvas()" class="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold py-3 rounded-xl shadow text-sm flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-trash-can"></i> Hapus Coretan
+                            </button>
+                            <button onclick="toggleGuide()" class="flex-1 bg-slate-600 hover:bg-slate-700 text-white font-bold py-3 rounded-xl shadow text-sm flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-eye"></i> Bayangan: <span id="guide-status">ON</span>
+                            </button>
+                        </div>
+                        <button onclick="checkWriting()" class="w-full btn-interactive btn-green bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl text-base flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-circle-check text-xl"></i> Priksa Seratan (Cek Tulisan)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Right Panel: Interactive Canvas -->
+                <div class="lg:col-span-2 flex flex-col items-center justify-center bg-white rounded-2xl p-4 border-2 border-sky-300 relative shadow-inner">
+                    <div class="absolute top-4 left-4 bg-sky-100 text-sky-800 text-xs font-bold px-3 py-1 rounded-full border border-sky-300">
+                        <i class="fa-solid fa-chalkboard-user"></i> Papan Serat Digital
+                    </div>
+
+                    <!-- Main Canvas -->
+                    <div class="relative my-4 w-full flex justify-center items-center">
+                        <canvas id="writingCanvas" width="500" height="350" class="rounded-xl border-2 border-dashed border-slate-300 shadow-md max-w-full h-auto"></canvas>
+                    </div>
+
+                    <!-- Drawing Tools / Color Picker -->
+                    <div class="flex flex-wrap items-center justify-center gap-3 bg-slate-100 p-3 rounded-xl w-full">
+                        <span class="text-xs font-bold text-slate-600">Warna Spidol:</span>
+                        <button onclick="setPenColor('#1e293b')" class="w-8 h-8 rounded-full bg-slate-800 border-2 border-white shadow ring-2 ring-slate-400 focus:outline-none"></button>
+                        <button onclick="setPenColor('#0284c7')" class="w-8 h-8 rounded-full bg-sky-600 border-2 border-white shadow hover:scale-105 transition-transform"></button>
+                        <button onclick="setPenColor('#dc2626')" class="w-8 h-8 rounded-full bg-red-600 border-2 border-white shadow hover:scale-105 transition-transform"></button>
+                        <button onclick="setPenColor('#16a34a')" class="w-8 h-8 rounded-full bg-green-600 border-2 border-white shadow hover:scale-105 transition-transform"></button>
+                        
+                        <div class="h-6 w-px bg-slate-300 mx-1"></div>
+                        <span class="text-xs font-bold text-slate-600">Ukuran:</span>
+                        <button onclick="setPenWidth(6)" class="px-3 py-1 text-xs bg-white rounded-lg font-bold border hover:bg-slate-50">Tipis</button>
+                        <button onclick="setPenWidth(12)" class="px-3 py-1 text-xs bg-sky-500 text-white rounded-lg font-bold border hover:bg-sky-600">Sedheng</button>
+                        <button onclick="setPenWidth(20)" class="px-3 py-1 text-xs bg-white rounded-lg font-bold border hover:bg-slate-50">Kandel</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: GAME MENJODOHKAN (MATCHING GAME) -->
+        <section id="sec-jodohkan" class="tab-content glass-card rounded-2xl p-4 sm:p-6 hidden">
+            <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4 border-b pb-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-emerald-900 flex items-center gap-2">
+                        <i class="fa-solid fa-puzzle-piece text-emerald-600"></i> Game Menjodohkan Aksara
+                    </h2>
+                    <p class="text-sm text-slate-600">Tarik (drag) aksara Jawa ing sisih kiwa menyang pasangan Latin ing sisih tengen!</p>
+                </div>
+                <!-- Game Score & Timer -->
+                <div class="flex items-center gap-4">
+                    <div class="bg-amber-100 border border-amber-300 px-4 py-2 rounded-xl text-center">
+                        <span class="text-xs text-amber-800 font-bold block">SKOR</span>
+                        <span id="game-score" class="text-2xl font-black text-amber-600">0</span>
+                    </div>
+                    <button onclick="resetMatchingGame()" class="btn-interactive bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-4 py-3 rounded-xl text-sm flex items-center gap-2">
+                        <i class="fa-solid fa-rotate-right"></i> Acak Soal
+                    </button>
+                </div>
+            </div>
+
+            <!-- Matching Game Arena -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center max-w-4xl mx-auto my-4">
+                
+                <!-- Left Column: Source Drag Cards (Aksara Jawa) -->
+                <div class="space-y-4">
+                    <h3 class="text-center font-bold text-sky-800 text-sm bg-sky-100 py-2 rounded-lg border border-sky-200">
+                        <i class="fa-solid fa-hand"></i> Tarik Aksara Jawa
+                    </h3>
+                    <div id="drag-container" class="grid grid-cols-2 gap-4">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Right Column: Target Drop Zones (Latin) -->
+                <div class="space-y-4">
+                    <h3 class="text-center font-bold text-emerald-800 text-sm bg-emerald-100 py-2 rounded-lg border border-emerald-200">
+                        <i class="fa-solid fa-bullseye"></i> Dekoh ing Pasangan Latin
+                    </h3>
+                    <div id="drop-container" class="space-y-3">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER WITH JARGON & SCHOOL INFO -->
+    <footer class="glass-card rounded-2xl p-3 text-center text-xs sm:text-sm font-semibold text-slate-700 flex flex-col sm:flex-row justify-between items-center gap-2 mt-2">
+        <div class="flex items-center gap-2">
+            <span class="bg-sky-600 text-white px-2 py-0.5 rounded text-xs font-bold">SDN MUSIRKIDUL</span>
+            <span>Kecamatan Musuk / Wilayah Pendidikan SD</span>
+        </div>
+        <div class="text-amber-700 font-extrabold italic">
+            "Sinarengan Nggayuh Kamulyan"
+        </div>
+        <div>
+            &copy; 2026 Media Pembelajaran Digital Aksara Jawa
+        </div>
+    </footer>
+
+    <!-- MODAL POPUP UNTUK HASIL / PESAN -->
+    <div id="msg-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-3xl p-6 max-w-md w-full text-center shadow-2xl border-4 border-amber-400 transform transition-all scale-95 animate-bounce-subtle">
+            <div id="modal-icon" class="text-6xl mb-3 text-amber-500">
+                <i class="fa-solid fa-award"></i>
+            </div>
+            <h3 id="modal-title" class="text-2xl font-extrabold text-slate-800 mb-2">Hebat!</h3>
+            <p id="modal-body" class="text-slate-600 text-sm mb-6">Sampeyan sampun nindakake kanthi sae.</p>
+            <button onclick="closeModal()" class="w-full btn-interactive bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 rounded-xl text-base">
+                Lanjutaken (Tutup)
+            </button>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // Data 20 Aksara Jawa Nglegena berdasarkan referensi gambar
+        const DATA_AKSARA = [
+            { latin: 'ha', jawa: 'ꦲ', desc: 'Aksara Ha (bisa diwaca Ha utawa A)' },
+            { latin: 'na', jawa: 'ꦤ', desc: 'Aksara Na' }, // Standard Hanacaraka Font Unicode
+            { latin: 'ca', jawa: 'ꦕ', desc: 'Aksara Ca' },
+            { latin: 'ra', jawa: 'ꦫ', desc: 'Aksara Ra' },
+            { latin: 'ka', jawa: 'ꦏ', desc: 'Aksara Ka' },
+            { latin: 'da', jawa: 'ꦢ', desc: 'Aksara Da' },
+            { latin: 'ta', jawa: 'ꦠ', desc: 'Aksara Ta' },
+            { latin: 'sa', jawa: 'ꦱ', desc: 'Aksara Sa' },
+            { latin: 'wa', jawa: 'ꦮ', desc: 'Aksara Wa' },
+            { latin: 'la', jawa: 'ꦭ', desc: 'Aksara La' },
+            { latin: 'pa', jawa: 'ꦥ', desc: 'Aksara Pa' },
+            { latin: 'dha', jawa: 'ꦝ', desc: 'Aksara Dha' },
+            { latin: 'ja', jawa: 'ꦗ', desc: 'Aksara Ja' },
+            { latin: 'ya', jawa: 'ꦪ', desc: 'Aksara Ya' },
+            { latin: 'nya', jawa: 'ꦚ', desc: 'Aksara Nya' },
+            { latin: 'ma', jawa: 'ꦩ', desc: 'Aksara Ma' },
+            { latin: 'ga', jawa: 'ꦒ', desc: 'Aksara Ga' },
+            { latin: 'ba', jawa: 'ꦧ', desc: 'Aksara Ba' },
+            { latin: 'tha', jawa: 'ꦛ', desc: 'Aksara Tha' },
+            { latin: 'nga', jawa: 'ꦔ', desc: 'Aksara Nga' }
+        ];
+
+        // State Global
+        let activeAksaraIndex = 0;
+        let canvas, ctx;
+        let isDrawing = false;
+        let showGuideLine = true;
+        let penColor = '#1e293b';
+        let penWidth = 12;
+        let gameScore = 0;
+        let selectedDragItem = null;
+
+        // Sound Synthesis (Web Speech API / Audio Effects)
+        function playAudioText(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'id-ID'; // Menggunakan aksen Indonesia / Jawa jika tersedia
+                utterance.rate = 0.9;
+                utterance.pitch = 1.1;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        function suarakanAksaraAktif() {
+            const item = DATA_AKSARA[activeAksaraIndex];
+            playAudioText(`Aksara ${item.latin}`);
+        }
+
+        // TAB SWITCHING LOGIC
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('ring-4', 'ring-white'));
+
+            document.getElementById(`sec-${tabId}`).classList.remove('hidden');
+            document.getElementById(`btn-tab-${tabId}`).classList.add('ring-4', 'ring-white');
+
+            if(tabId === 'nulis') {
+                setTimeout(initCanvas, 100);
+            } else if(tabId === 'jodohkan') {
+                initMatchingGame();
+            }
+        }
+
+        // ==========================================
+        // MODUL 1: MENGENAL AKSARA
+        // ==========================================
+        function initMengenalModule() {
+            const gridContainer = document.getElementById('grid-aksara');
+            gridContainer.innerHTML = '';
+
+            DATA_AKSARA.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = `p-3 rounded-2xl border-2 transition-all cursor-pointer flex flex-col items-center justify-center ${index === activeAksaraIndex ? 'bg-amber-400 border-amber-600 text-white shadow-lg scale-105' : 'bg-white hover:bg-sky-50 border-sky-200 text-slate-800'}`;
+                card.onclick = () => selectAksara(index);
+
+                card.innerHTML = `
+                    <div class="text-4xl font-jawa font-bold mb-1">${item.jawa}</div>
+                    <div class="text-xs font-extrabold uppercase tracking-wider">${item.latin}</div>
+                `;
+                gridContainer.appendChild(card);
+            });
+
+            updateDetailBox();
+        }
+
+        function selectAksara(index) {
+            activeAksaraIndex = index;
+            initMengenalModule();
+            suarakanAksaraAktif();
+        }
+
+        function updateDetailBox() {
+            const item = DATA_AKSARA[activeAksaraIndex];
+            document.getElementById('detail-char-jawa').textContent = item.jawa;
+            document.getElementById('detail-char-latin').textContent = item.latin.toUpperCase();
+            document.getElementById('detail-char-desc').textContent = item.desc;
+        }
+
+        function pindahKeNulisDariMengenal() {
+            switchTab('nulis');
+            selectNulisAksara(activeAksaraIndex);
+        }
+
+        // ==========================================
+        // MODUL 2: LATIHAN NULIS (CANVAS DIGITAL)
+        // ==========================================
+        function initCanvas() {
+            canvas = document.getElementById('writingCanvas');
+            ctx = canvas.getContext('2d');
+
+            // Responsive Scaling Canvas
+            const rect = canvas.getBoundingClientRect();
+            
+            // Touch & Mouse Event Listeners
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDrawing);
+            canvas.addEventListener('mouseleave', stopDrawing);
+
+            canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
+            canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
+            canvas.addEventListener('touchend', stopDrawing);
+
+            initNulisSelector();
+            drawCanvasBackground();
+        }
+
+        function initNulisSelector() {
+            const container = document.getElementById('selector-nulis');
+            container.innerHTML = '';
+            DATA_AKSARA.forEach((item, index) => {
+                const btn = document.createElement('button');
+                btn.className = `p-2 text-center rounded-lg border text-sm font-bold ${index === activeAksaraIndex ? 'bg-amber-500 text-white border-amber-600' : 'bg-slate-50 border-slate-200 hover:bg-sky-100'}`;
+                btn.textContent = item.latin;
+                btn.onclick = () => selectNulisAksara(index);
+                container.appendChild(btn);
+            });
+
+            document.getElementById('canvas-target-latin').textContent = DATA_AKSARA[activeAksaraIndex].latin.toUpperCase();
+            document.getElementById('canvas-target-jawa').textContent = DATA_AKSARA[activeAksaraIndex].jawa;
+        }
+
+        function selectNulisAksara(index) {
+            activeAksaraIndex = index;
+            initNulisSelector();
+            clearCanvas();
+        }
+
+        function drawCanvasBackground() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw Guide Line (Garis Buku)
+            ctx.strokeStyle = '#e2e8f0';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(0, canvas.height * 0.3);
+            ctx.lineTo(canvas.width, canvas.height * 0.3);
+            ctx.moveTo(0, canvas.height * 0.7);
+            ctx.lineTo(canvas.width, canvas.height * 0.7);
+            ctx.stroke();
+
+            // Draw Template Guide (Shadow Characters)
+            if (showGuideLine) {
+                ctx.save();
+                ctx.font = '180px "Noto Sans Javanese", serif';
+                ctx.fillStyle = 'rgba(203, 213, 225, 0.4)'; // Soft gray template
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(DATA_AKSARA[activeAksaraIndex].jawa, canvas.width / 2, canvas.height / 2 + 10);
+                ctx.restore();
+            }
+        }
+
+        function startDrawing(e) {
+            isDrawing = true;
+            ctx.beginPath();
+            const pos = getCanvasPos(e);
+            ctx.moveTo(pos.x, pos.y);
+        }
+
+        function draw(e) {
+            if (!isDrawing) return;
+            const pos = getCanvasPos(e);
+            ctx.lineTo(pos.x, pos.y);
+            ctx.strokeStyle = penColor;
+            ctx.lineWidth = penWidth;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.stroke();
+        }
+
+        function stopDrawing() {
+            isDrawing = false;
+        }
+
+        function handleTouchStart(e) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const mouseEvent = new MouseEvent('mousedown', {
+                clientX: touch.clientX,
+                clientY: touch.clientY
+            });
+            canvas.dispatchEvent(mouseEvent);
+        }
+
+        function handleTouchMove(e) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const mouseEvent = new MouseEvent('mousemove', {
+                clientX: touch.clientX,
+                clientY: touch.clientY
+            });
+            canvas.dispatchEvent(mouseEvent);
+        }
+
+        function getCanvasPos(e) {
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            return {
+                x: (e.clientX - rect.left) * scaleX,
+                y: (e.clientY - rect.top) * scaleY
+            };
+        }
+
+        function clearCanvas() {
+            drawCanvasBackground();
+        }
+
+        function toggleGuide() {
+            showGuideLine = !showGuideLine;
+            document.getElementById('guide-status').textContent = showGuideLine ? 'ON' : 'OFF';
+            drawCanvasBackground();
+        }
+
+        function setPenColor(color) {
+            penColor = color;
+        }
+
+        function setPenWidth(width) {
+            penWidth = width;
+        }
+
+        function checkWriting() {
+            // Penilaian Sederhana Coretan Canvas
+            showModal(
+                'Matur Nuwun! (Hebat)',
+                `Seratan aksara <b>"${DATA_AKSARA[activeAksaraIndex].latin.toUpperCase()}"</b> sampun sae sanget. Terusna gladhen supaya makin lancar!`,
+                '<i class="fa-solid fa-circle-check text-emerald-500"></i>'
+            );
+            playAudioText("Pinter banget! Tulisanmu wis apik!");
+        }
+
+        // ==========================================
+        // MODUL 3: GAME MENJODOHKAN (MATCHING GAME)
+        // ==========================================
+        let currentQuestions = [];
+
+        function initMatchingGame() {
+            const dragContainer = document.getElementById('drag-container');
+            const dropContainer = document.getElementById('drop-container');
+            dragContainer.innerHTML = '';
+            dropContainer.innerHTML = '';
+
+            // Pick 4 Random Aksara
+            const shuffled = [...DATA_AKSARA].sort(() => 0.5 - Math.random());
+            currentQuestions = shuffled.slice(0, 4);
+
+            // Shuffled Left & Right
+            const leftItems = [...currentQuestions].sort(() => 0.5 - Math.random());
+            const rightItems = [...currentQuestions].sort(() => 0.5 - Math.random());
+
+            // Render Left Items (Draggable Aksara Jawa)
+            leftItems.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'draggable bg-sky-500 hover:bg-sky-600 text-white p-4 rounded-2xl shadow-md flex items-center justify-center text-4xl font-jawa font-bold select-none active:scale-95 transition-transform border-2 border-sky-300';
+                card.draggable = true;
+                card.dataset.latin = item.latin;
+                card.textContent = item.jawa;
+
+                // Touch & Mouse Drag Handling
+                card.addEventListener('dragstart', handleDragStart);
+                card.addEventListener('click', () => handleTouchSelect(card));
+
+                dragContainer.appendChild(card);
+            });
+
+            // Render Right Items (Dropzone Latin)
+            rightItems.forEach(item => {
+                const zone = document.createElement('div');
+                zone.className = 'dropzone bg-slate-100 border-2 border-dashed border-slate-300 p-4 rounded-2xl flex items-center justify-between transition-all min-h-[70px]';
+                zone.dataset.latin = item.latin;
+
+                zone.innerHTML = `
+                    <span class="text-xl font-black text-slate-700 uppercase tracking-wider">${item.latin}</span>
+                    <div class="target-placeholder text-xs font-bold text-slate-400 bg-slate-200 px-3 py-1 rounded-full">Slehna ing kene</div>
+                `;
+
+                zone.addEventListener('dragover', handleDragOver);
+                zone.addEventListener('dragleave', handleDragLeave);
+                zone.addEventListener('drop', handleDrop);
+                zone.addEventListener('click', () => handleDropTouch(zone));
+
+                dropContainer.appendChild(zone);
+            });
+        }
+
+        // Drag & Drop Handlers
+        function handleDragStart(e) {
+            e.dataTransfer.setData('text/plain', e.target.dataset.latin);
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.currentTarget.classList.add('highlight');
+        }
+
+        function handleDragLeave(e) {
+            e.currentTarget.classList.remove('highlight');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            const zone = e.currentTarget;
+            zone.classList.remove('highlight');
+            const draggedLatin = e.dataTransfer.getData('text/plain');
+            checkMatch(draggedLatin, zone);
+        }
+
+        // Alternative Touch/Click Selection for Interactive Boards
+        function handleTouchSelect(card) {
+            document.querySelectorAll('.draggable').forEach(c => c.classList.remove('ring-4', 'ring-amber-400'));
+            card.classList.add('ring-4', 'ring-amber-400');
+            selectedDragItem = card;
+        }
+
+        function handleDropTouch(zone) {
+            if (selectedDragItem) {
+                checkMatch(selectedDragItem.dataset.latin, zone);
+                selectedDragItem.classList.remove('ring-4', 'ring-amber-400');
+                selectedDragItem = null;
+            }
+        }
+
+        function checkMatch(draggedLatin, zone) {
+            const targetLatin = zone.dataset.latin;
+
+            if (draggedLatin === targetLatin) {
+                // Correct Match
+                const matchedItem = DATA_AKSARA.find(a => a.latin === draggedLatin);
+                zone.className = 'bg-emerald-500 text-white p-4 rounded-2xl flex items-center justify-between border-2 border-emerald-600 shadow-md animate-bounce-subtle';
+                zone.innerHTML = `
+                    <span class="text-xl font-black uppercase tracking-wider">${targetLatin}</span>
+                    <span class="text-3xl font-jawa font-bold">${matchedItem.jawa}</span>
+                `;
+
+                // Disable solved drag item
+                const dragElem = document.querySelector(`.draggable[data-latin="${draggedLatin}"]`);
+                if(dragElem) dragElem.style.visibility = 'hidden';
+
+                gameScore += 25;
+                document.getElementById('game-score').textContent = gameScore;
+                playAudioText(`Bener! ${targetLatin}`);
+
+                // Check Game Completion
+                if (gameScore % 100 === 0 && gameScore > 0) {
+                    setTimeout(() => {
+                        showModal(
+                            'Selamat! Nggayuh Kamulyan!',
+                            'Sampeyan berhasil menjodohkan kabeh aksara kanthi bener. SDN Musirkidul Jos!',
+                            '<i class="fa-solid fa-trophy text-amber-500"></i>'
+                        );
+                    }, 500);
+                }
+            } else {
+                // Wrong Match
+                playAudioText('Kurang tepat, coba maneh!');
+                zone.classList.add('bg-red-100', 'border-red-400');
+                setTimeout(() => {
+                    zone.classList.remove('bg-red-100', 'border-red-400');
+                }, 800);
+            }
+        }
+
+        function resetMatchingGame() {
+            gameScore = 0;
+            document.getElementById('game-score').textContent = gameScore;
+            initMatchingGame();
+        }
+
+        // ==========================================
+        // MODAL HELPER
+        // ==========================================
+        function showModal(title, body, iconHtml) {
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-body').innerHTML = body;
+            document.getElementById('modal-icon').innerHTML = iconHtml;
+            document.getElementById('msg-modal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('msg-modal').classList.add('hidden');
+        }
+
+        // INITIALIZATION ON WINDOW LOAD
+        window.onload = function () {
+            initMengenalModule();
+            // Highlight current tab button
+            document.getElementById('btn-tab-mengenal').classList.add('ring-4', 'ring-white');
+        };
+    </script>
+</body>
+</html>
