@@ -310,13 +310,14 @@
     <footer class="glass-card rounded-2xl p-3 text-center text-xs sm:text-sm font-semibold text-slate-700 flex flex-col sm:flex-row justify-between items-center gap-2 mt-2">
         <div class="flex items-center gap-2">
             <span class="bg-sky-600 text-white px-2 py-0.5 rounded text-xs font-bold">SDN MUSIRKIDUL</span>
-            <span>Kecamatan Musuk / Wilayah Pendidikan SD</span>
+            <span>REJOSO - NGANJUK</span>
         </div>
         <div class="text-amber-700 font-extrabold italic">
             "Sinarengan Nggayuh Kamulyan"
         </div>
-        <div>
-            &copy; 2026 Media Pembelajaran Digital Aksara Jawa
+        <div class="flex items-center gap-1 text-slate-800 font-bold bg-amber-100/80 px-3 py-1 rounded-lg border border-amber-300">
+            <i class="fa-solid fa-user-tie text-amber-600"></i>
+            <span>by Iwan Edi Putra, M.Pd. (Kepala SD Negeri Musirkidul)</span>
         </div>
     </footer>
 
@@ -708,14 +709,14 @@
                     setTimeout(() => {
                         showModal(
                             'Selamat! Nggayuh Kamulyan!',
-                            'Sampeyan berhasil menjodohkan kabeh aksara kanthi bener. SDN Musirkidul Jos!',
+                            'Sampeyan berhasil menjodohkan kabeh aksara kanthi bener. ASIKKKK JOSSS!',
                             '<i class="fa-solid fa-trophy text-amber-500"></i>'
                         );
                     }, 500);
                 }
             } else {
                 // Wrong Match
-                playAudioText('Kurang tepat, coba maneh!');
+                playAudioText('Kurang pas, coba maneh!');
                 zone.classList.add('bg-red-100', 'border-red-400');
                 setTimeout(() => {
                     zone.classList.remove('bg-red-100', 'border-red-400');
